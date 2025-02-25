@@ -16,16 +16,10 @@ import org.springframework.web.servlet.ModelAndView;
 //DispatcherServlet是SpringMVC的核心组件，当DispatcherServlet在类路径下时，才会装载这个bean
 public class UserInfoInterceptor implements HandlerInterceptor
 {
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
     {
-//        String attribute = (String) request.getAttribute("user-info");
-//        if (StringUtils.isNotEmpty(attribute))
-//        {
-//            UserContext.setUser(Long.valueOf(attribute));
-//        }
-        String header = response.getHeader("user-info");
+        String header = request.getHeader("user-info");
         if (StringUtils.isNotEmpty(header))
         {
             UserContext.setUser(Long.valueOf(header));

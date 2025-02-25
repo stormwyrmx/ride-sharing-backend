@@ -13,11 +13,12 @@ import lombok.Data;
 /**
  * @TableName order
  */
-@TableName(value ="order")
+@TableName(value ="`order`")
 @Data
 @Builder
 public class Order implements Serializable {
-    @TableId(value = "id", type = IdType.AUTO)
+
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long passengerId;

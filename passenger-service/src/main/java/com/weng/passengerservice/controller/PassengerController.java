@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/passengers")
 @RequiredArgsConstructor
-@Validated
 public class PassengerController {
 
     private final PassengerService passengerService;

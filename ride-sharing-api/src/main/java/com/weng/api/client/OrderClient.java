@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
-//指定远程地址
-@FeignClient(name = "order-service")//这个 Feign 客户端将会向名为 "cart-service" 的服务发送请求
+//指定远程地址，不能加@RequestMapping
+@FeignClient(name = "order-service")//这个 Feign 客户端将会向名为 "order-service" 的服务发送请求
 public interface OrderClient
 {
     //指定请求方式
@@ -20,7 +20,7 @@ public interface OrderClient
     /**
      * 乘客呼叫订单
      */
-    @PostMapping("/add")
+    @PostMapping("/orders/add")
     void addOrder(@RequestBody OrderAddRequest orderAddRequest);
 
     /**
@@ -28,7 +28,7 @@ public interface OrderClient
      * @param orderConfirmRequest
      * @return
      */
-    @PutMapping("/confirm")
+    @PutMapping("/orders/confirm")
     void confirmOrder(@RequestBody OrderConfirmRequest orderConfirmRequest);
 
     /**
@@ -36,7 +36,8 @@ public interface OrderClient
      * @param orderId
      * @return
      */
-    @PutMapping("/finish")
-    void finishOrder(Long orderId);
+    @PutMapping("/orders/finish")
+    //在 Feign 中，当使用 @RequestParam 或 @PathVariable 参数时，需要明确指定参数名称，否则参数值会丢失。
+    void finishOrder(@RequestParam("orderId")Long orderId);
 
 }

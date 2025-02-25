@@ -6,6 +6,7 @@ import com.weng.api.dto.OrderConfirmRequest;
 import com.weng.orderservice.domain.Order;
 import com.weng.orderservice.mapper.OrderMapper;
 import com.weng.orderservice.service.OrderService;
+import jakarta.annotation.Resource;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     implements OrderService {
 
-    @Mapper
+    @Resource
     private OrderMapper orderMapper;
 
     @Override
@@ -45,7 +46,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
 
     @Override
     public void finishOrder(Long orderId) {
-        orderMapper.updateById(Order.builder().id(orderId).status(2).build());
+        Order order = Order.builder()
+                .id(orderId)
+                .status(2)
+                .build();
+
+        orderMapper.updateById(order);
     }
 
 
