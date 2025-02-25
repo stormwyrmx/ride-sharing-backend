@@ -1,0 +1,53 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: gateway
+  # Spring MVC found on classpath, which is incompatible with Spring Cloud Gateway.
+#  main:
+#    web-application-type: reactive
+  cloud:
+    nacos:
+      server-addr: 192.168.203.132
+    gateway:
+#      # 响应式网关的跨域的配置使用yaml，mvc的网关的配置是通过代码
+#      globalcors:
+#        cors-configurations:
+#          '[/**]': # 允许所有请求头
+#            allowed-origin-patterns: "*"
+#            allowed-headers: "*"
+#            allowed-methods: "*"
+      mvc:
+        routes:
+  #          - id: item-service # 路由的id，没有规定规则但要求唯一，建议配合服务名（spring.application.name）
+  #            uri: lb://item-service # 路由微服务的目标，从注册中心获取服务列表，lb表示负载均衡。
+  #            predicates: # 路由断言（规则），判断请求是否符合规则，如果符合机路由到uri里写的目标
+  #              - Path=/items/**,/search/** # 以请求路径做判断，以/items开头则符合
+  #            # 192.168.203.132:8080/items/** => 192.168.203.132:8081/items/** 或 192.168.203.132:8083/items/**
+  #            filters:
+  #              - AddRequestHeader=name, husiqi
+          - id: order-service
+            uri: lb://order-service
+            predicates:
+              - Path=/orders/**
+          - id: driver-service
+            uri: lb://driver-service
+            predicates:
+              - Path=/drivers/**
+          - id: passenger-service
+            uri: lb://passenger-service
+            predicates:
+              - Path=/passengers/**
+
+ride-sharing:
+  jwt:
+    secret-key: weng
+  auth:
+    # todo:看看sky-take-out中到底是怎么实现的
+    exclude-paths:
+      - /passengers/login
+      - /passengers/register
+      - /drivers/login
+      - /drivers/register
+      - /hi
+
