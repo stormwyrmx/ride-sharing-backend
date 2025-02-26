@@ -5,6 +5,9 @@ import com.weng.driverservice.domain.dto.RegisterRequest;
 import com.weng.driverservice.domain.entity.Driver;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.weng.driverservice.domain.vo.LoginVO;
+import com.weng.driverservice.domain.vo.OrderVO;
+
+import java.util.List;
 
 /**
 * @author weng
@@ -16,4 +19,6 @@ public interface DriverService extends IService<Driver> {
     LoginVO login(LoginRequest loginRequest);
 
     Long register(RegisterRequest registerRequest);
+
+    List<OrderVO> searchRide();
 }

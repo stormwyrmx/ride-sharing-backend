@@ -5,6 +5,8 @@ import com.weng.api.dto.OrderAddRequest;
 import com.weng.api.dto.OrderConfirmRequest;
 import com.weng.orderservice.domain.Order;
 
+import java.util.List;
+
 /**
 * @author weng
 * @description 针对表【order(订单表)】的数据库操作Service
@@ -17,4 +19,6 @@ public interface OrderService extends IService<Order> {
     void confirmOrder(OrderConfirmRequest orderConfirmRequest);
 
     void addOrder(OrderAddRequest orderAddRequest);
+
+    List<Order> listOrderByStatus(Integer status);
 }

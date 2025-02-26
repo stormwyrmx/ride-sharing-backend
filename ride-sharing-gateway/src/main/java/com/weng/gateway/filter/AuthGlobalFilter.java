@@ -4,6 +4,7 @@ import com.weng.common.utils.JwtUtil;
 import com.weng.gateway.config.AuthProperties;
 import com.weng.common.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -15,6 +16,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -46,11 +48,12 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             }
         }
         //3.获取token
-        List<String> headers = request.getHeaders().get("authorization");
-        String token = null;
-        if (!CollectionUtils.isEmpty(headers)) {
-            token = headers.get(0);
-        }
+        String token = getJwtFromRequest(request);
+//        List<String> headers = request.getHeaders().get("authorization");
+//        String token = null;
+//        if (!CollectionUtils.isEmpty(headers)) {
+//            token = headers.get(0);
+//        }
         Claims claims;
         //4.校验jwt，得到userId
         try {
@@ -73,4 +76,17 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         //返回值越小，优先级越高，保证在NettyRoutingFilter之前执行
         return 0;
     }
+
+    private String getJwtFromRequest(ServerHttpRequest request) {
+        List<String> headers = request.getHeaders().get("Authorization");
+        String token=null;
+        if (!CollectionUtils.isEmpty(headers)) {
+            token = headers.get(0);
+        }
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+        return token;
+    }
+
 }

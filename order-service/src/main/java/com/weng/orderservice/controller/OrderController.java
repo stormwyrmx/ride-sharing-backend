@@ -3,17 +3,26 @@ package com.weng.orderservice.controller;
 import com.weng.api.dto.OrderAddRequest;
 import com.weng.api.dto.OrderConfirmRequest;
 import com.weng.common.domain.Result;
+import com.weng.orderservice.domain.Order;
 import com.weng.orderservice.service.OrderService;
 import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
     @Resource
     private OrderService orderService;
+
+    /**
+     * 输入订单的状态后，查询订单
+     */
+    @GetMapping("/list/{status}")
+    public List<Order> listOrder(@PathVariable Integer status){
+        return orderService.listOrderByStatus(status);
+    }
 
     /**
      * 乘客呼叫订单

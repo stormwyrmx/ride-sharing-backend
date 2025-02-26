@@ -1,5 +1,6 @@
 package com.weng.orderservice.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.weng.api.dto.OrderAddRequest;
 import com.weng.api.dto.OrderConfirmRequest;
@@ -7,8 +8,9 @@ import com.weng.orderservice.domain.Order;
 import com.weng.orderservice.mapper.OrderMapper;
 import com.weng.orderservice.service.OrderService;
 import jakarta.annotation.Resource;
-import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author weng
@@ -21,6 +23,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
 
     @Resource
     private OrderMapper orderMapper;
+
+    @Override
+    public List<Order> listOrderByStatus(Integer status) {
+        LambdaQueryWrapper<Order> orderLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        orderLambdaQueryWrapper.eq(Order::getStatus, status);
+        return orderMapper.selectList(orderLambdaQueryWrapper);
+    }
 
     @Override
     public void addOrder(OrderAddRequest orderAddRequest) {
@@ -48,9 +57,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     public void finishOrder(Long orderId) {
         Order order = Order.builder()
                 .id(orderId)
-                .status(2)
+                .status(2) // 2表示订单已完成
                 .build();
-
         orderMapper.updateById(order);
     }
 

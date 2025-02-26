@@ -2,6 +2,10 @@ package com.weng.driverservice.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.weng.api.client.OrderClient;
+import com.weng.api.client.PassengerClient;
+import com.weng.api.dto.Order;
+import com.weng.api.dto.Passenger;
 import com.weng.common.domain.ResultCodeEnum;
 import com.weng.common.exception.BusinessException;
 import com.weng.common.properties.JwtProperties;
@@ -11,6 +15,7 @@ import com.weng.driverservice.domain.dto.RegisterRequest;
 import com.weng.driverservice.domain.entity.Driver;
 import com.weng.driverservice.domain.entity.Vehicle;
 import com.weng.driverservice.domain.vo.LoginVO;
+import com.weng.driverservice.domain.vo.OrderVO;
 import com.weng.driverservice.mapper.VehicleMapper;
 import com.weng.driverservice.service.DriverService;
 import com.weng.driverservice.mapper.DriverMapper;
@@ -22,7 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
 * @author weng
@@ -42,11 +49,10 @@ public class DriverServiceImpl extends ServiceImpl<DriverMapper, Driver>
     private JwtProperties jwtProperties;
     @Resource
     private VehicleMapper vehicleMapper;
-
-//    private final DriverMapper driverMapper;
-//    private final JwtUtil jwtUtil;
-//    private final JwtProperties jwtProperties;
-//    private final VehicleMapper vehicleMapper;
+    @Resource
+    private PassengerClient passengerClient;
+    @Resource
+    private OrderClient orderClient;
 
     @Override
     public LoginVO login(LoginRequest loginRequest) {
@@ -101,6 +107,35 @@ public class DriverServiceImpl extends ServiceImpl<DriverMapper, Driver>
         driverMapper.insert(driver);//如果插入失败，它会抛出异常.而不是返回一个负数
         //4.返回id
         return driver.getId();
+    }
+
+    @Override
+    public List<OrderVO> searchRide() {
+        List<Order> listOrder = orderClient.listOrder(0);
+        List<Long> passengerIds = listOrder.stream()
+                .map(Order::getPassengerId)
+                .distinct()
+                .toList();
+        //要尽量减少调用次数，因此一次查询出所有的乘客的信息
+        List<Passenger> passengerList = passengerClient.getPassengerByIds(passengerIds);
+        // 将乘客信息转换为Map，方便查找
+        Map<Long, Passenger> passengerMap = passengerList.stream()
+                .collect(Collectors.toMap(Passenger::getId, p -> p));
+        // 构建OrderVO列表
+        //这样每次都能找到对应order的乘客信息
+        return listOrder.stream()
+                .map(order -> {
+                    //这样每次都能找到对应order的乘客信息
+                    Passenger passenger = passengerMap.get(order.getPassengerId());
+                    return OrderVO.builder()
+                            .id(order.getId())
+                            .passengerName(passenger.getName())
+                            .passengerPhone(passenger.getPhone())
+                            .pickupLocation(order.getPickupLocation())
+                            .destination(order.getDestination())
+                            .createTime(order.getCreateTime())
+                            .build();
+                }).toList();
     }
 
 
