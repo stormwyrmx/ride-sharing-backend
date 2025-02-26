@@ -22,6 +22,7 @@ public class UserInfoInterceptor implements HandlerInterceptor
         String header = request.getHeader("user-info");
         if (StringUtils.isNotEmpty(header))
         {
+            //直接调用了类中的静态方法
             UserContext.setUser(Long.valueOf(header));
         }
         return true;

@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "passenger-service")
+@FeignClient(name = "passenger-service",path = "/passengers")
 public interface PassengerClient {
 
-    @GetMapping("/passengers/listByIds")
+    @GetMapping("/listByIds")
     List<Passenger> getPassengerByIds(@RequestParam("ids") List<Long> ids);
 
 }
